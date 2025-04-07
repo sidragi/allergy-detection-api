@@ -38,20 +38,20 @@ async def predict(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="Image decoding failed")
 
         resize = tf.image.resize(img, (256, 256))
-        yhat = model.predict(np.expand_dims(resize / 255.0, 0))[0][0]
+        conf = model.predict(np.expand_dims(resize / 255.0, 0))[0][0]
 
-        if yhat < 0.1:
+        if conf < 0.1:
             result = "Severe allergy. Please visit a doctor immediately."
-        elif yhat < 0.3:
+        elif conf < 0.3:
             result = "Moderate allergy. Please consult a doctor."
-        elif yhat < 0.5:
+        elif conf < 0.5:
             result = "Mild allergy. Monitor the condition."
-        elif yhat < 0.7:
+        elif conf < 0.7:
             result = "Low chance of allergy. Keep an eye on symptoms."
         else:
             result = "No signs of allergy."
 
-        return {"result": result, "confidence": float(yhat)}
+        return {"result": result, "confidence": float(conf)}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
