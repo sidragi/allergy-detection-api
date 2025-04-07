@@ -1,14 +1,14 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
-from PIL import Image
-import io
+import cv2
 import tensorflow as tf
 import keras
+import io
 
 app = FastAPI()
 
-# CORS middleware for frontend access
+# CORS middleware taken from template
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,7 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load the Keras 3 model
+# model made on google colab with dataset of 800 and trained on keras 3+
 model = keras.saving.load_model("allergyDetection.h5")
 
 @app.get("/")
@@ -31,24 +31,27 @@ async def predict(file: UploadFile = File(...)):
 
     try:
         image_data = await file.read()
-        image = Image.open(io.BytesIO(image_data)).convert("RGB")
-        image = image.resize((256, 256))
-        img_array = np.array(image) / 255.0
-        img_array = np.expand_dims(img_array, axis=0)
+        image_bytes = np.frombuffer(image_data, np.uint8)
+        img = cv2.imdecode(image_bytes, cv2.IMREAD_COLOR)
 
-        prediction = model.predict(img_array)[0][0]
+        if img is None:
+            raise HTTPException(status_code=400, detail="Image decoding failed")
 
-        if prediction < 0.1:
+        resize = tf.image.resize(img, (256, 256))
+        yhat = model.predict(np.expand_dims(resize / 255.0, 0))[0][0]
+
+        if yhat < 0.1:
             result = "Severe allergy. Please visit a doctor immediately."
-        elif prediction < 0.3:
+        elif yhat < 0.3:
             result = "Moderate allergy. Please consult a doctor."
-        elif prediction < 0.5:
+        elif yhat < 0.5:
             result = "Mild allergy. Monitor the condition."
-        elif prediction < 0.7:
+        elif yhat < 0.7:
             result = "Low chance of allergy. Keep an eye on symptoms."
         else:
             result = "No signs of allergy."
 
-        return {"result": result, "confidence": float(prediction)}
+        return {"result": result, "confidence": float(yhat)}
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
