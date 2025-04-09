@@ -5,3 +5,4 @@ numpy
 tensorflow
 python-multipart
 opencv-python
+requests
