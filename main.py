@@ -38,7 +38,7 @@ async def predict(file: UploadFile = File(...)): #takes file input
             raise HTTPException(status_code=400, detail="Image decoding failed")
 
         resize = tf.image.resize(img, (256, 256)) #resizes the image 
-        sev = model.predict(np.expand_dims(resize / 255.0, 0))[0][0] #puts the image into a numpy array to input into the model
+        sev = float(model.predict(np.expand_dims(resize / 255.0, 0))[0][0]) #puts the image into a numpy array to input into the model
 
         if sev < 0.1: #cetrain conditions based on model output, its vague 
             result = "Severe allergy. Please visit a doctor immediately."
