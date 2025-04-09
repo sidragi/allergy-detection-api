@@ -5,6 +5,7 @@ import cv2 #to convert the model
 import tensorflow as tf # to handle keras lib
 import keras #keras lib main thing where the the model is trained on
 import io
+from pydantic import BaseModel
 
 app = FastAPI() # app init
 
