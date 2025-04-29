@@ -24,6 +24,6 @@ An AI-powered Allergy Detection API built with **FastAPI** that analyzes images 
 
 - ## Author
 
-Sid**  
+**Sid**  
 GitHub: [sidragi](https://github.com/sidragi)  
 LinkedIn: [sid lahiri](https://www.linkedin.com/in/lahiri-sid/)
