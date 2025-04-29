@@ -22,7 +22,7 @@ An AI-powered Allergy Detection API built with **FastAPI** that analyzes images 
 - Botpress – for chatbot-based frontend interface
 - Python – core programming language
 
-- ## Author
+## Author
 
 **Sid**  
 GitHub: [sidragi](https://github.com/sidragi)  
